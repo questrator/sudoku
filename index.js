@@ -121,18 +121,19 @@ const cellSettings = {
 };
 
 const sudoku = document.querySelector(".sudoku");
-sudoku.addEventListener("mousedown", clickHandler);
+sudoku.addEventListener("mousedown", clickCellHandler);
 
-const startNums = Array.from({length: 81}, (e, i) => i % 9 + 1);
+const buttonGenerate = document.querySelector(".sudoku-generate");
+buttonGenerate.addEventListener("click", setFieldValues);
 
-function clickHandler(event) {
+function clickCellHandler(event) {
     const els = ["b", "h", "v"].map(e => cellGroups[e][event.target.dataset[e]]).flat();
     for (let i = 0; i < els.length; i++) {        
         els[i].style.backgroundColor = "lightpink";
-        sudoku.removeEventListener("mousedown", clickHandler);
+        sudoku.removeEventListener("mousedown", clickCellHandler);
         setTimeout(() => {
             els[i].style.backgroundColor = "transparent";
-            sudoku.addEventListener("mousedown", clickHandler);
+            sudoku.addEventListener("mousedown", clickCellHandler);
         }, 400);
     }
 }
@@ -193,10 +194,18 @@ function setRowValues(h) {
     return true;
 }
 
-for (let h = 0; h < 9; h++) {
+function setFieldValues(event) {
+    cellGroups["h"].flat().map(e => e.textContent = "");
+    for (let h = 0; h < 9; h++) {
     const rowStatus = setRowValues(h);
-    if (!rowStatus) {
-        cellGroups["h"][h - 1].map(e => e.textContent = "");
-        h -= 2;
+        if (!rowStatus) {
+            cellGroups["h"][h - 1].map(e => e.textContent = "");
+            h -= 2;
+        }
     }
+    hideFieldValues();
+}
+
+function hideFieldValues(event) {
+    cellGroups["h"].flat().map(e => e.textContent = getRandom(1, 100) >= 10 ? e.textContent : "");
 }
