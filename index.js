@@ -161,7 +161,6 @@ for (let i = 0; i < 3**4; i++) {
         cell.classList.add("no-right-border");
     }
     sudoku.insertAdjacentElement("beforeend", cell);
-    // cell.textContent = i;
 }
 
 (function updateCellGroups() {
@@ -172,9 +171,32 @@ for (let i = 0; i < 3**4; i++) {
     });
 })();
 
-console.log(cellGroups)
+function setRowValues(h) {
+    const freeNums = Array.from({length: 9}, (e, i) => i + 1);
+    const rowCells = cellGroups["h"][h];
+    for (let i = 0; i < rowCells.length; i++) {
+        const cell = rowCells[i];
+        const envCells = ["b", "h", "v"].map(e => cellGroups[e][cell.dataset[e]]).flat().map(e => +e.textContent);
+        const numsFiltered = freeNums.filter(e => !envCells.includes(e));        
 
-for (let i = 0; i < 81; i++) {
-    const cell = sudoku.querySelector(`.sudoku-cell[data-id="${i}"]`);
-    
+        const randFilteredIndex = getRandom(0, numsFiltered.length - 1);
+        const randFilteredNum = numsFiltered[randFilteredIndex];
+        const numIndexToDelete = freeNums.indexOf(randFilteredNum);
+
+        cell.textContent = randFilteredNum;
+        if (cell.textContent === "") {
+            rowCells.map(e => e.textContent = "");
+            return false;
+        }        
+        freeNums.splice(numIndexToDelete, 1);
+    }
+    return true;
+}
+
+for (let h = 0; h < 9; h++) {
+    const rowStatus = setRowValues(h);
+    if (!rowStatus) {
+        cellGroups["h"][h - 1].map(e => e.textContent = "");
+        h -= 2;
+    }
 }
